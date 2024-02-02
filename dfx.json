@@ -1,0 +1,30 @@
+{
+  "canisters": {
+    "ethcdm_reservations_backend": {
+      "candid": "src/ethcdm_reservations_backend/ethcdm_reservations_backend.did",
+      "package": "ethcdm_reservations_backend",
+      "type": "rust"
+    },
+    "ethcdm_reservations_frontend": {
+      "dependencies": [
+        "ethcdm_reservations_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/ethcdm_reservations_frontend/src/index.html"
+      },
+      "source": [
+        "src/ethcdm_reservations_frontend/assets",
+        "dist/ethcdm_reservations_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
