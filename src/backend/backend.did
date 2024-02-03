@@ -8,4 +8,5 @@ service : {
     createReservation: (principal, text, nat, nat, text) -> ();
     validateReservation: (nat, text) -> ();
     cancelReservation: (nat) -> ();
+	getTour: (principal) -> (Tour);
 }
