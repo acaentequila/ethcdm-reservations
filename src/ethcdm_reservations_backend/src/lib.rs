@@ -1,13 +1,17 @@
+mod pool;
 mod types;
 mod utils;
 
-use std::{cell::RefCell, collections::BTreeMap};
+use types::*;
+use utils::*;
 
 use candid::{Nat, Principal};
 use ic_cdk::{query, update};
-use utils::*;
-
-use crate::types::*;
+use std::{
+    cell::RefCell,
+    collections::BTreeMap,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 thread_local! {
     static TOUR_BY_OWNER_ID: RefCell<BTreeMap<Principal, Tour>> = RefCell::default();
@@ -15,6 +19,13 @@ thread_local! {
     // static RESERVATIONS_BY_OWNER_ID: RefCell<BTreeMap<Principal, ReservationId>> = RefCell::default();
     static RESERVATIONS_COUNTER: RefCell<Nat> = RefCell::new(Nat::from(0_u32));
 }
+
+const ONE_WEEK: Milliseconds = 604_800_000;
+
+const CANCELLATION_POLICY: CancellationPolicy = CancellationPolicy {
+    full_refund: ONE_WEEK * 2,
+    half_refund: ONE_WEEK,
+};
 
 // METHODS
 #[update(name = "registerTour")]
@@ -29,7 +40,7 @@ fn create_reservation(
     tour_id: Principal,
     name: String,
     persons: Nat,
-    date: Miliseconds,
+    date: Milliseconds,
     hashed_password: String,
 ) {
     let caller = ic_cdk::caller();
@@ -37,13 +48,15 @@ fn create_reservation(
     let tour = TOUR_BY_OWNER_ID.with(|state| state.borrow().get(&tour_id).cloned().unwrap());
 
     // 2. todo: send tokens to the liquidity pool
-    let price_paid: Balance = Nat::from(tour.price);
+    let price_paid: Balance = tour.price;
+    pool::deposit(price_paid.clone());
 
     // 3. get a new ID
     let new_id: ReservationId = RESERVATIONS_COUNTER.with(|counter| {
         *counter.borrow_mut() += 1u32;
         counter.borrow().clone()
     });
+
     // 4. create a new reservation
     RESERVATION_BY_ID.with(|state| {
         // insert the new reservation
@@ -77,14 +90,51 @@ fn validate_reservation(reservation_id: ReservationId, password: String) {
         // 4. modify the reservation state
         RESERVATION_BY_ID.with(|state| {
             state.borrow_mut().get_mut(&reservation_id).unwrap().state = ReservationStates::Scanned
-        })
+        });
 
-        // 5. todo: send the money to the host
+        // 5. send the money to the host
+        pool::transfer(reservation.price_paid, reservation.tour_id);
     }
 }
 
 #[update(name = "cancelReservation")]
-fn cancel_reservation(reservation_id: ReservationId) {}
+fn cancel_reservation(reservation_id: ReservationId) {
+    // 1. get the reservation
+    let reservation: Reservation =
+        RESERVATION_BY_ID.with(|state| state.borrow().get(&reservation_id).cloned().unwrap());
+
+    // 2. get the difference between reservation.reserved_date and current timestamp
+    let now: Milliseconds = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis();
+    let delta_time: Milliseconds = reservation.reserved_date - now;
+
+    let mut to_refund = 0u32;
+
+    // 3. use CancellationPolicy to determine if the user will receive any refund or not
+    if delta_time >= CANCELLATION_POLICY.full_refund {
+        // full refund
+        to_refund = 100;
+    } else if delta_time >= CANCELLATION_POLICY.half_refund
+        && delta_time < CANCELLATION_POLICY.full_refund
+    {
+        // half refund
+        to_refund = 50;
+    }
+
+    // 4. refund tokens to user
+    if to_refund > 0 {
+        // tranfer the tokens
+        let amount: Balance = (reservation.price_paid.clone() / 100u32) * to_refund;
+
+        pool::transfer(amount, reservation.owner)
+    }
+    // 5. change state to the reservation
+    RESERVATION_BY_ID.with(|state| {
+        state.borrow_mut().get_mut(&reservation_id).unwrap().state = ReservationStates::Cancelled
+    })
+}
 
 #[query(name = "listTours")]
 fn list_tours() -> Vec<Tour> {
