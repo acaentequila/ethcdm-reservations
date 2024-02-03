@@ -1,40 +1,32 @@
-use std::{collections::HashMap, u32, u8};
-
-use candid::CandidType;
+use candid::{CandidType, Nat};
 
 use crate::*;
 
-pub struct State {
-    pub tour_by_owner_id: HashMap<Principal, Tour>,
-    pub reservation_by_id: HashMap<String, Reservation>,
-    pub reservations_by_owner_id: HashMap<Principal, Vec<Reservation>>,
-}
-
 // types to be concise
-pub type Miliseconds = u32;
-pub type ReservationId = u32;
-pub type Balance = u32;
+pub type Miliseconds = Nat;
+pub type ReservationId = Nat;
+pub type Balance = Nat;
 
 // todo: create structs
-#[derive(CandidType)]
+#[derive(CandidType, Clone)]
 pub struct Tour {
-    title: String,
-    price: Balance,
+    pub title: String,
+    pub price: Balance,
 }
 
-#[derive(CandidType)]
+#[derive(CandidType, Clone)]
 pub struct Reservation {
-    owner: Principal,
-    tour_id: Principal,
-    reserved_date: Miliseconds,
-    hashed_password: String,
-    price_paid: Balance,
-    name: String,
-    persons: u8,
+    pub owner: Principal,
+    pub tour_id: Principal,
+    pub reserved_date: Miliseconds,
+    pub hashed_password: String,
+    pub price_paid: Balance,
+    pub name: String,
+    pub persons: Nat,
 }
 
-#[derive(CandidType)]
+#[derive(CandidType, Clone)]
 pub struct CancellationPolicy {
-    full_refuld: Miliseconds,
-    half_refuld: Miliseconds,
+    pub full_refuld: Miliseconds,
+    pub half_refuld: Miliseconds,
 }
