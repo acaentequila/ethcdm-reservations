@@ -1,4 +1,7 @@
+use std::time::{SystemTime, UNIX_EPOCH};
 use sha2::{Digest, Sha256};
+
+use crate::Milliseconds;
 
 pub fn sha256(input: String) -> String {
     // 1. create a new SHA-256 hasher
@@ -17,4 +20,11 @@ pub fn sha256(input: String) -> String {
         .collect::<String>();
 
     hash_string
+}
+
+pub fn timestamp() -> Milliseconds {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis()
 }
