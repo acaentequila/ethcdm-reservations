@@ -1,10 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { ThemeUIProvider } from 'theme-ui'
 import App from './App.tsx'
-import './index.css'
+import { theme } from './theme.ts'
+import ICProvider from './context/connect2ic.provider.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+	<React.StrictMode>
+		<ICProvider>
+			<ThemeUIProvider theme={theme}>
+				<App />
+			</ThemeUIProvider>
+		</ICProvider>
+	</React.StrictMode>,
 )
