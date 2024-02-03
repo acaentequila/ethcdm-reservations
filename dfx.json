@@ -10,11 +10,10 @@
         "backend"
       ],
       "frontend": {
-        "entrypoint": "src/frontend/src/index.html"
+        "entrypoint": "src/frontend/out/index.html"
       },
       "source": [
-        "src/frontend/assets",
-        "dist/frontend/"
+        "src/frontend/out"
       ],
       "type": "assets"
     }
