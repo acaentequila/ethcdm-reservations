@@ -7,11 +7,7 @@ use utils::*;
 
 use candid::{Nat, Principal};
 use ic_cdk::{query, update};
-use std::{
-    cell::RefCell,
-    collections::BTreeMap,
-    time::{SystemTime, UNIX_EPOCH},
-};
+use std::{cell::RefCell, collections::BTreeMap};
 
 thread_local! {
     static TOUR_BY_OWNER_ID: RefCell<BTreeMap<Principal, Tour>> = RefCell::default();
@@ -44,7 +40,13 @@ fn create_reservation(
 ) {
     let caller = ic_cdk::caller();
     // 1. Get the tour information
-    let tour = TOUR_BY_OWNER_ID.with(|state| state.borrow().get(&tour_id).cloned().unwrap());
+    let tour = TOUR_BY_OWNER_ID.with(|state| {
+        state
+            .borrow()
+            .get(&tour_id)
+            .cloned()
+            .expect("No tour found")
+    });
 
     // 2. send tokens to the liquidity pool
     let price_paid: Balance = tour.price;
@@ -77,9 +79,15 @@ fn create_reservation(
 
 #[update(name = "validateReservation")]
 fn validate_reservation(reservation_id: ReservationId, password: String) {
+    // todo: add some response
     // 1. read the reservation
-    let reservation: Reservation =
-        RESERVATION_BY_ID.with(|state| state.borrow().get(&reservation_id).cloned().unwrap());
+    let reservation: Reservation = RESERVATION_BY_ID.with(|state| {
+        state
+            .borrow()
+            .get(&reservation_id)
+            .cloned()
+            .expect("No reservation found")
+    });
 
     // 2. hash the password
     let hashed_password: String = sha256(password);
@@ -99,14 +107,16 @@ fn validate_reservation(reservation_id: ReservationId, password: String) {
 #[update(name = "cancelReservation")]
 fn cancel_reservation(reservation_id: ReservationId) {
     // 1. get the reservation
-    let reservation: Reservation =
-        RESERVATION_BY_ID.with(|state| state.borrow().get(&reservation_id).cloned().unwrap());
+    let reservation: Reservation = RESERVATION_BY_ID.with(|state| {
+        state
+            .borrow()
+            .get(&reservation_id)
+            .cloned()
+            .expect("No reservation found")
+    });
 
     // 2. get the difference between reservation.reserved_date and current timestamp
-    let now: Milliseconds = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis();
+    let now: Milliseconds = timestamp();
     let delta_time: Milliseconds = reservation.reserved_date - now;
 
     let mut to_refund = 0u32;
@@ -152,5 +162,11 @@ fn list_tours() -> Vec<(Principal, Tour)> {
 #[query(name = "getTour")]
 fn get_tour(tour_id: Principal) -> Tour {
     // 1. return the tour
-    TOUR_BY_OWNER_ID.with(|state| state.borrow().get(&tour_id).cloned().unwrap())
+    TOUR_BY_OWNER_ID.with(|state| {
+        state
+            .borrow()
+            .get(&tour_id)
+            .cloned()
+            .expect("No tour found")
+    })
 }
