@@ -25,6 +25,8 @@ const client = createClient({
 	],
 })
 
+console.log({ backend })
+
 interface IProps {
 	children: ReactNode
 }
