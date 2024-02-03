@@ -3,13 +3,9 @@ mod types;
 use std::{cell::RefCell, collections::HashMap};
 
 use candid::Principal;
+use ic_cdk::{query, update};
 
 use crate::types::*;
-
-#[ic_cdk::query]
-fn greet(name: String) -> String {
-    format!("Hello, {}!", name)
-}
 
 // todo: define persistent state
 thread_local! {
@@ -21,10 +17,19 @@ thread_local! {
 }
 
 // todo: add methods
-fn register_tour(title: String, price: u32) {}
-fn create_reservation(tour_id: Principal, date: u32, hashed_password: String) {}
-fn validate_reservation(reservation_id: u32, password: String) {}
+#[update(name = "registerTour")]
+fn register_tour(title: String, price: Balance) {}
+
+#[update(name = "createReservation")]
+fn create_reservation(tour_id: Principal, date: Miliseconds, hashed_password: String) {}
+
+#[update(name = "validateReservation")]
+fn validate_reservation(reservation_id: ReservationId, password: String) {}
+
+#[update(name = "cancelReservation")]
+fn cancel_reservation(reservation_id: ReservationId) {}
+
+#[query(name = "listTours")]
 fn list_tours() -> Vec<Tour> {
     vec![]
 }
-fn cancel_reservation(reservation_id: u32) {}
