@@ -3,14 +3,15 @@ use candid::{CandidType, Nat};
 use crate::*;
 
 // types to be concise
-pub type Miliseconds = Nat;
+pub type Milliseconds = u128;
 pub type ReservationId = Nat;
 pub type Balance = Nat;
 
 #[derive(CandidType, Clone)]
 pub enum ReservationStates {
     Created,
-    Scanned
+    Scanned,
+    Cancelled
 }
 
 // todo: create structs
@@ -24,7 +25,7 @@ pub struct Tour {
 pub struct Reservation {
     pub owner: Principal,
     pub tour_id: Principal,
-    pub reserved_date: Miliseconds,
+    pub reserved_date: Milliseconds,
     pub hashed_password: String,
     pub price_paid: Balance,
     pub name: String,
@@ -34,6 +35,6 @@ pub struct Reservation {
 
 #[derive(CandidType, Clone)]
 pub struct CancellationPolicy {
-    pub full_refuld: Miliseconds,
-    pub half_refuld: Miliseconds,
+    pub full_refund: Milliseconds,
+    pub half_refund: Milliseconds,
 }
