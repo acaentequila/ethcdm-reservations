@@ -7,6 +7,12 @@ pub type Miliseconds = Nat;
 pub type ReservationId = Nat;
 pub type Balance = Nat;
 
+#[derive(CandidType, Clone)]
+pub enum ReservationStates {
+    Created,
+    Scanned
+}
+
 // todo: create structs
 #[derive(CandidType, Clone)]
 pub struct Tour {
@@ -23,6 +29,7 @@ pub struct Reservation {
     pub price_paid: Balance,
     pub name: String,
     pub persons: Nat,
+    pub state: ReservationStates  
 }
 
 #[derive(CandidType, Clone)]
