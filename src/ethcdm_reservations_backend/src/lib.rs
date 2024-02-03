@@ -16,7 +16,6 @@ use std::{
 thread_local! {
     static TOUR_BY_OWNER_ID: RefCell<BTreeMap<Principal, Tour>> = RefCell::default();
     static RESERVATION_BY_ID: RefCell<BTreeMap<ReservationId, Reservation>> = RefCell::default();
-    // static RESERVATIONS_BY_OWNER_ID: RefCell<BTreeMap<Principal, ReservationId>> = RefCell::default();
     static RESERVATIONS_COUNTER: RefCell<Nat> = RefCell::new(Nat::from(0_u32));
 }
 
@@ -47,7 +46,7 @@ fn create_reservation(
     // 1. Get the tour information
     let tour = TOUR_BY_OWNER_ID.with(|state| state.borrow().get(&tour_id).cloned().unwrap());
 
-    // 2. todo: send tokens to the liquidity pool
+    // 2. send tokens to the liquidity pool
     let price_paid: Balance = tour.price;
     pool::deposit(price_paid.clone());
 
@@ -83,7 +82,7 @@ fn validate_reservation(reservation_id: ReservationId, password: String) {
         RESERVATION_BY_ID.with(|state| state.borrow().get(&reservation_id).cloned().unwrap());
 
     // 2. hash the password
-    let hashed_password: String = get_sha256(password);
+    let hashed_password: String = sha256(password);
 
     // 3. compare the hashed_password with reservation.hashed_password
     if reservation.hashed_password == hashed_password {
@@ -137,8 +136,17 @@ fn cancel_reservation(reservation_id: ReservationId) {
 }
 
 #[query(name = "listTours")]
-fn list_tours() -> Vec<Tour> {
-    vec![]
+fn list_tours() -> Vec<(Principal, Tour)> {
+    // we could add pagination and filtering here
+    let tours: Vec<(Principal, Tour)> = TOUR_BY_OWNER_ID.with(|state| {
+        state
+            .borrow()
+            .iter()
+            .map(|(principal, tour)| (principal.clone(), tour.clone()))
+            .collect()
+    });
+
+    tours
 }
 
 #[query(name = "getTour")]

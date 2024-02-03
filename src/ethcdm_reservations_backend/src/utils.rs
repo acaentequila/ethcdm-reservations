@@ -1,6 +1,6 @@
 use sha2::{Digest, Sha256};
 
-pub fn get_sha256(input: String) -> String {
+pub fn sha256(input: String) -> String {
     // 1. create a new SHA-256 hasher
     let mut hasher = Sha256::new();
 
@@ -11,7 +11,10 @@ pub fn get_sha256(input: String) -> String {
     let hash_result = hasher.finalize();
 
     // 4. convert the result to a hexadecimal string
-    let hash_string = hash_result.iter().map(|byte| format!("{:02x}", byte)).collect::<String>();
+    let hash_string = hash_result
+        .iter()
+        .map(|byte| format!("{:02x}", byte))
+        .collect::<String>();
 
     hash_string
 }
