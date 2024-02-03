@@ -1,3 +1,11 @@
+type Tour = record {
+    title: text;
+    price: nat;
+}
+
 service : {
-    "greet": (text) -> (text) query;
+    registerTour: (text, nat) -> ();
+    createReservation: (principal, text, nat, nat, text) -> ();
+    validateReservation: (nat, text) -> ();
+    cancelReservation: (nat) -> ();
 }
