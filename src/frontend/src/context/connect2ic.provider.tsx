@@ -6,18 +6,10 @@ import "@connect2ic/core/style.css"
 import { ReactNode } from "react"
 import * as backend from '../../../declarations/backend'
 
-console.log({
-	backend,
-	env: import.meta.env.DFX_VERSION
-})
-
 const client = createClient({
 	canisters: {
-		backend: {
-			canisterId: backend.canisterId,
-			// @ts-ignore
-			idlFactory: backend.idlFactory
-		}
+		// @ts-ignore
+		backend
 	},
 	providers: [
 		new AstroX(),
