@@ -1,29 +1,63 @@
 {
-  "canisters": {
-    "backend": {
-      "candid": "src/backend/backend.did",
-      "package": "backend",
-      "type": "rust"
-    },
-    "frontend": {
-      "dependencies": [
-        "backend"
-      ],
-      "frontend": {
-        "entrypoint": "src/frontend/out/index.html"
-      },
-      "source": [
-        "src/frontend/out"
-      ],
-      "type": "assets"
-    }
-  },
-  "defaults": {
-    "build": {
-      "args": "",
-      "packtool": ""
-    }
-  },
-  "output_env_file": ".env",
-  "version": 1
+	"canisters": {
+		"backend": {
+			"candid": "src/backend/backend.did",
+			"package": "backend",
+			"type": "rust"
+		},
+		"frontend": {
+			"dependencies": [
+				"backend"
+			],
+			"frontend": {
+				"entrypoint": "src/frontend/out/index.html"
+			},
+			"source": [
+				"src/frontend/out"
+			],
+			"type": "assets"
+		},
+		"mobile": {
+			"dependencies": [
+				"backend"
+			],
+			"frontend": {
+				"entrypoint": "src/mobile/out/index.html"
+			},
+			"source": [
+				"src/mobile/out"
+			],
+			"type": "assets"
+		},
+		"internet_identity": {
+			"type": "custom",
+			"candid": "https://github.com/dfinity/internet-identity/releases/download/release-2024-02-02/internet_identity.did",
+			"wasm": "https://github.com/dfinity/internet-identity/releases/download/release-2024-02-02/internet_identity_dev.wasm.gz",
+			"remote": {
+				"id": {
+					"ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+				}
+			}
+		}
+	},
+	"networks": {
+		"local": {
+			"bind": "0.0.0.0:8000",
+			"type": "ephemeral"
+		},
+		"ic": {
+			"providers": [
+				"https://mainnet.dfinity.network"
+			],
+			"type": "persistent"
+		}
+	},
+	"defaults": {
+		"build": {
+			"args": "",
+			"packtool": ""
+		}
+	},
+	"output_env_file": ".env",
+	"version": 1
 }

@@ -13,7 +13,10 @@ const ToursList: React.FC = () => {
 	}, [])
 
 	const getTours = async () => {
-		const tours = await backend.listTours()
+		let res = (await backend.listTours()) as [any, Tour][]
+		console.log({ res })
+		let tours = res.map((tour) => tour[1])
+
 		setTours(tours as Tour[])
 	}
 

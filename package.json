@@ -9,9 +9,9 @@
 		"Canister"
 	],
 	"scripts": {
-		"build": "cd src/frontend && npm run build",
+		"build": "npm --prefix src/frontend run build && npm --prefix src/mobile run build",
 		"prebuild": "dfx generate",
-		"start": "cd src/frontend && npm run start",
+		"start": "npm --prefix src/frontend run start && npm --prefix src/mobile run start",
 		"deploy:local": "dfx deploy --network=local",
 		"deploy:ic": "dfx deploy --network=ic",
 		"generate": "dfx generate backend"

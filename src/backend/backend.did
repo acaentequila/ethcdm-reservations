@@ -8,6 +8,6 @@ service : {
     createReservation: (principal, text, nat, nat, text) -> ();
     validateReservation: (nat, text) -> ();
     cancelReservation: (nat) -> ();
-	getTour: (principal) -> (Tour);
 	listTours: () -> (vec record { principal; Tour });
+	getTour: (principal) -> (Tour);
 }
