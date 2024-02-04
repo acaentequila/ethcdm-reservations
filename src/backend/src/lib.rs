@@ -62,7 +62,7 @@ fn create_reservation(
     RESERVATION_BY_ID.with(|state| {
         // insert the new reservation
         state.borrow_mut().insert(
-            new_id,
+            new_id.clone(),
             Reservation {
                 owner: caller,
                 tour_id,

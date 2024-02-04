@@ -3,12 +3,12 @@ import { Flex } from "theme-ui"
 
 const Navbar = () => {
 	const { isConnected, principal } = useConnect({
-		onConnect: () => {
-			// Signed in
-		},
-		onDisconnect: () => {
-			// Signed out
-		}
+		// onConnect: () => {
+		// 	// Signed in
+		// },
+		// onDisconnect: () => {
+		// 	// Signed out
+		// }
 	})
 
 	return (

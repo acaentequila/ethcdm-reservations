@@ -1,10 +1,10 @@
-import { Box, Button, Card, Grid, Input, Label, Text } from "theme-ui"
+import { Box, Button, Card, Close, Grid, Input, Label, Text } from "theme-ui"
 import Modal from 'react-modal'
 import { useCanister } from "@connect2ic/react"
 import { Tour } from "../types/tour"
 import { FormEvent, useState } from "react"
 import { createPassword } from "../utils/passwordManager"
-import { createQrCode } from "../utils/qrCode"
+import QRCode from "react-qr-code"
 
 interface IProps {
 	isOpen: boolean,
@@ -16,6 +16,7 @@ const ReserveModal: React.FC<IProps> = ({ tour, isOpen, onRequestClose }) => {
 	const [name, setName] = useState<string>('')
 	const [persons, setPersons] = useState<number>(1)
 	const [date, setDate] = useState<string>('')
+	const [qrCode, setQrCode] = useState<string>('')
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault()
@@ -23,19 +24,27 @@ const ReserveModal: React.FC<IProps> = ({ tour, isOpen, onRequestClose }) => {
 		// create password
 		const [password, hashed_password] = createPassword()
 
-
-		const id = await backend.createReservation(tour.owner, name, persons, date, hashed_password)
-
-		// create the qr code
-		const qrCode = createQrCode({ password })
-
-		// render qr code
-		console.log(qrCode, id)
+		setQrCode(JSON.stringify({ password }))
+		alert('done')
+		await backend.createReservation(tour.owner, name, persons, date, hashed_password)
 	}
 
-	return <Modal isOpen={isOpen} onRequestClose={onRequestClose}>
+
+	const customStyles = {
+		content: {
+			top: '50%',
+			left: '50%',
+			right: 'auto',
+			bottom: 'auto',
+			marginRight: '-50%',
+			transform: 'translate(-50%, -50%)',
+		},
+	};
+
+	return <Modal style={customStyles} isOpen={isOpen} onRequestClose={onRequestClose}>
 		<Card>
 			<Grid>
+				<Close onClick={onRequestClose} />
 				<Box>{tour.title}</Box>
 				<Box>{tour.price}</Box>
 				<Box as="form" onSubmit={handleSubmit}>
@@ -55,6 +64,13 @@ const ReserveModal: React.FC<IProps> = ({ tour, isOpen, onRequestClose }) => {
 
 
 					<Button type="submit">Reserve</Button>
+
+					{qrCode && <QRCode
+						size={256}
+						style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+						value={qrCode}
+						viewBox={`0 0 256 256`}
+					/>}
 				</Box>
 			</Grid>
 		</Card>
