@@ -9,4 +9,5 @@ service : {
     validateReservation: (nat, text) -> ();
     cancelReservation: (nat) -> ();
 	getTour: (principal) -> (Tour);
+	listTours: () -> (vec record { principal; Tour });
 }
